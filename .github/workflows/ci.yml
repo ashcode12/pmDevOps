@@ -1,25 +1,36 @@
- name: CI
+name: CI
 
 on: [push, pull_request]
 
 jobs:
-  build-test:
+  build-and-test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:17  # Updated to match your local version
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pmdevops
+        ports:
+          - "5432:5432"
+    
     steps:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+      - name: Use Node.js 22.13.1
+        uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 22.13.1  # Updated to match your local version
 
       - name: Install dependencies
         run: npm install
 
       - name: Run tests
         run: npm test
-      
+
       - name: Build Docker image
-        run: docker build -t pmdevops:${{ github.sha }} .
+        run: |
+          docker build -t myuser/pmdevops:${{ github.sha }} .
