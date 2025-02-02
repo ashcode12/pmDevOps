@@ -1,15 +1,9 @@
 const express = require("express");
-const cors = require("cors");
-const generatePassword = require("./utils/passwordGenerator");
+const generatePassword = require("../utils/passwordGenerator");
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const router = express.Router();
 
-app.use(cors());
-app.use(express.json());
-
-// Password Generation Route
-app.get("/api/password/generate", (req, res) => {
+router.get("/generate", (req, res) => {
   try {
     const { length, includeLowercase, includeUppercase, includeNumbers, includeSpecialChars } = req.query;
 
@@ -27,6 +21,4 @@ app.get("/api/password/generate", (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+module.exports = router;
