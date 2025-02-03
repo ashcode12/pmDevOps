@@ -15,12 +15,13 @@ const pool = new Pool({
 });
 
 pool.connect()
-    .then(() => console.log('Connected to Vault DB'))
+    .then(() => console.log('Connected to Auth DB'))
     .catch(err => console.error('Database connection error:', err));
 
+// Test Route
 app.get('/', (req, res) => {
-    res.send('Vault Service Running');
+    res.send('Auth Service Running');
 });
 
-const PORT = process.env.PORT || 4001;
-app.listen(PORT, () => console.log(`Vault service running on port ${PORT}`));
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`Auth service running on port ${PORT}`));
