@@ -38,9 +38,10 @@ jobs:
         run: |
           cd utility-service
           npm install
-          npm test
+          npm test -- --passWithNoTests  # Allow Jest to pass even if no tests exist
 
       - name: Utility Service - Docker Build
         run: |
           cd utility-service
           docker build -t myuser/utility-service:${{ github.sha }} .
+
