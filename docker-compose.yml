@@ -1,9 +1,22 @@
-version: "3"
 services:
-  app:
-    build: .
+  auth-service:
+    build: ./auth-service
     ports:
-      - "3000:3000"
+      - "4000:4000"
+    environment:
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=pmdevops
+      - JWT_SECRET=superSecret
+    depends_on:
+      - db
+
+  vault-service:
+    build: ./vault-service
+    ports:
+      - "4001:4001"
     environment:
       - DB_USER=postgres
       - DB_PASS=postgres
@@ -13,7 +26,18 @@ services:
       - JWT_SECRET=superSecret
       - ENCRYPTION_KEY=12345678901234567890123456789012
     depends_on:
+      - auth-service
       - db
+
+  utility-service:
+    build: ./utility-service
+    ports:
+      - "4002:4002"
+    environment:
+      - PORT=4002
+    depends_on:
+      - auth-service
+      - vault-service
 
   db:
     image: postgres:15

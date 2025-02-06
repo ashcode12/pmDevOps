@@ -1,2 +1,4 @@
 node_modules
 .env
+
+# token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImlhdCI6MTczODg0OTg3MywiZXhwIjoxNzM4ODUzNDczfQ.E4gJ5tjfhR5pTST2phgyC4cJNYlnqWoyOSmiofDbfvg
