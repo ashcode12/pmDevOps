@@ -11,6 +11,7 @@ jobs:
     outputs:
       auth-service: ${{ steps.filter.outputs.auth-service }}
       vault-service: ${{ steps.filter.outputs.vault-service }}
+      password-service: ${{ steps.filter.outputs.password-service }}
     steps:
       - name: 🔽 Checkout Repository
         uses: actions/checkout@v3
@@ -24,6 +25,8 @@ jobs:
               - 'auth-service/**'
             vault-service:
               - 'vault-service/**'
+            password-service:
+              - 'password-service/**'
 
   deploy-auth-service:
     needs: check-changes
@@ -84,5 +87,36 @@ jobs:
         run: |
           gcloud run deploy vault-service \
             --image europe-west1-docker.pkg.dev/pmdevops/vault-service/vault-service:latest \
+            --region europe-west1 \
+            --allow-unauthenticated
+
+  deploy-password-service:
+    needs: check-changes
+    if: needs.check-changes.outputs.password-service == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔽 Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: 🔐 Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: ⛅ Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: 🔄 Configure Docker for Google Artifact Registry
+        run: gcloud auth configure-docker europe-west1-docker.pkg.dev
+
+      - name: 🏗 Build & Push Password-Service
+        run: |
+          docker build -t europe-west1-docker.pkg.dev/pmdevops/password-service/password-service:latest ./password-service
+          docker push europe-west1-docker.pkg.dev/pmdevops/password-service/password-service:latest
+
+      - name: 🚀 Deploy Password-Service to Cloud Run
+        run: |
+          gcloud run deploy password-service \
+            --image europe-west1-docker.pkg.dev/pmdevops/password-service/password-service:latest \
             --region europe-west1 \
             --allow-unauthenticated
