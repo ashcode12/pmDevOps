@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Selective Microservice Deployment in GitHub Actions.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h2 id="%F0%9F%94%8D-overview"><strong>🔍 Overview</strong></h2>
+<p>The previous deployment strategy <strong>redeployed all microservices</strong> whenever changes were pushed to the <code>main</code> branch. This approach was inefficient as it:</p>
+<ul>
+<li>Wasted cloud resources by redeploying unchanged services.</li>
+<li>Increased deployment time unnecessarily.</li>
+<li>Added risk to stable microservices due to frequent deployments.</li>
+</ul>
+<p>To optimize our Continuous Deployment (CD) process, we implemented <strong>Selective Microservice Deployment</strong> using GitHub Actions.</p>
+<hr>
+<h2 id="%F0%9F%8E%AF-goal"><strong>🎯 Goal</strong></h2>
+<p>✅ <strong>Ensure only changed microservices are built &amp; deployed.</strong><br>
+✅ <strong>Reduce deployment time &amp; cloud costs.</strong><br>
+✅ <strong>Improve scalability for future microservices.</strong></p>
+<hr>
+<h2 id="%F0%9F%9B%A0-changes-implemented"><strong>🛠 Changes Implemented</strong></h2>
+<h3 id="1%EF%B8%8F%E2%83%A3-detect-changes-before-deployment"><strong>1️⃣ Detect Changes Before Deployment</strong></h3>
+<p>We used the <a href="https://github.com/dorny/paths-filter"><code>dorny/paths-filter</code></a> GitHub Action to check which microservices were modified before running the build and deploy steps.</p>
+<pre class="hljs"><code><div>  <span class="hljs-attr">check-changes:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">outputs:</span>
+      <span class="hljs-attr">auth-service:</span> <span class="hljs-string">${{</span> <span class="hljs-string">steps.filter.outputs.auth-service</span> <span class="hljs-string">}}</span>
+      <span class="hljs-attr">vault-service:</span> <span class="hljs-string">${{</span> <span class="hljs-string">steps.filter.outputs.vault-service</span> <span class="hljs-string">}}</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🔽</span> <span class="hljs-string">Checkout</span> <span class="hljs-string">Repository</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🔍</span> <span class="hljs-string">Detect</span> <span class="hljs-string">Changes</span>
+        <span class="hljs-attr">id:</span> <span class="hljs-string">filter</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">dorny/paths-filter@v2</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">filters:</span> <span class="hljs-string">|
+            auth-service:
+              - 'auth-service/**'
+            vault-service:
+              - 'vault-service/**'
+</span></div></code></pre>
+<ul>
+<li>If <strong>no changes</strong> are detected for a microservice, <strong>it will not be built or deployed</strong>.</li>
+<li>If <strong>changes exist</strong>, GitHub Actions <strong>runs the corresponding deployment job</strong>.</li>
+</ul>
+<hr>
+<h3 id="2%EF%B8%8F%E2%83%A3-independent-deployment-jobs"><strong>2️⃣ Independent Deployment Jobs</strong></h3>
+<p>Each microservice (<code>auth-service</code> and <code>vault-service</code>) <strong>has its own job</strong>, which only runs if changes are detected.</p>
+<p>✅ <strong>Build &amp; deploy <code>auth-service</code> only if changes were made:</strong></p>
+<pre class="hljs"><code><div>  <span class="hljs-attr">deploy-auth-service:</span>
+    <span class="hljs-attr">needs:</span> <span class="hljs-string">check-changes</span>
+    <span class="hljs-attr">if:</span> <span class="hljs-string">needs.check-changes.outputs.auth-service</span> <span class="hljs-string">==</span> <span class="hljs-string">'true'</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🔽</span> <span class="hljs-string">Checkout</span> <span class="hljs-string">Repository</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🔐</span> <span class="hljs-string">Authenticate</span> <span class="hljs-string">with</span> <span class="hljs-string">Google</span> <span class="hljs-string">Cloud</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">google-github-actions/auth@v1</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">credentials_json:</span> <span class="hljs-string">${{</span> <span class="hljs-string">secrets.GCP_SA_KEY</span> <span class="hljs-string">}}</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">⛅</span> <span class="hljs-string">Set</span> <span class="hljs-string">up</span> <span class="hljs-string">Google</span> <span class="hljs-string">Cloud</span> <span class="hljs-string">SDK</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">google-github-actions/setup-gcloud@v1</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🔄</span> <span class="hljs-string">Configure</span> <span class="hljs-string">Docker</span> <span class="hljs-string">for</span> <span class="hljs-string">Google</span> <span class="hljs-string">Artifact</span> <span class="hljs-string">Registry</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">gcloud</span> <span class="hljs-string">auth</span> <span class="hljs-string">configure-docker</span> <span class="hljs-string">europe-west1-docker.pkg.dev</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🏗</span> <span class="hljs-string">Build</span> <span class="hljs-string">&amp;</span> <span class="hljs-string">Push</span> <span class="hljs-string">Auth-Service</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|
+          docker build -t europe-west1-docker.pkg.dev/pmdevops/auth-service/auth-service:latest ./auth-service
+          docker push europe-west1-docker.pkg.dev/pmdevops/auth-service/auth-service:latest
+</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🚀</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">Auth-Service</span> <span class="hljs-string">to</span> <span class="hljs-string">Cloud</span> <span class="hljs-string">Run</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|
+          gcloud run deploy auth-service \
+            --image europe-west1-docker.pkg.dev/pmdevops/auth-service/auth-service:latest \
+            --region europe-west1 \
+            --allow-unauthenticated
+</span></div></code></pre>
+<p>✅ <strong>Same process for <code>vault-service</code>:</strong></p>
+<pre class="hljs"><code><div>  <span class="hljs-attr">deploy-vault-service:</span>
+    <span class="hljs-attr">needs:</span> <span class="hljs-string">check-changes</span>
+    <span class="hljs-attr">if:</span> <span class="hljs-string">needs.check-changes.outputs.vault-service</span> <span class="hljs-string">==</span> <span class="hljs-string">'true'</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🔽</span> <span class="hljs-string">Checkout</span> <span class="hljs-string">Repository</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🔐</span> <span class="hljs-string">Authenticate</span> <span class="hljs-string">with</span> <span class="hljs-string">Google</span> <span class="hljs-string">Cloud</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">google-github-actions/auth@v1</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">credentials_json:</span> <span class="hljs-string">${{</span> <span class="hljs-string">secrets.GCP_SA_KEY</span> <span class="hljs-string">}}</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">⛅</span> <span class="hljs-string">Set</span> <span class="hljs-string">up</span> <span class="hljs-string">Google</span> <span class="hljs-string">Cloud</span> <span class="hljs-string">SDK</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">google-github-actions/setup-gcloud@v1</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🔄</span> <span class="hljs-string">Configure</span> <span class="hljs-string">Docker</span> <span class="hljs-string">for</span> <span class="hljs-string">Google</span> <span class="hljs-string">Artifact</span> <span class="hljs-string">Registry</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">gcloud</span> <span class="hljs-string">auth</span> <span class="hljs-string">configure-docker</span> <span class="hljs-string">europe-west1-docker.pkg.dev</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🏗</span> <span class="hljs-string">Build</span> <span class="hljs-string">&amp;</span> <span class="hljs-string">Push</span> <span class="hljs-string">Vault-Service</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|
+          docker build -t europe-west1-docker.pkg.dev/pmdevops/vault-service/vault-service:latest ./vault-service
+          docker push europe-west1-docker.pkg.dev/pmdevops/vault-service/vault-service:latest
+</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🚀</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">Vault-Service</span> <span class="hljs-string">to</span> <span class="hljs-string">Cloud</span> <span class="hljs-string">Run</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|
+          gcloud run deploy vault-service \
+            --image europe-west1-docker.pkg.dev/pmdevops/vault-service/vault-service:latest \
+            --region europe-west1 \
+            --allow-unauthenticated
+</span></div></code></pre>
+<hr>
+<h2 id="%E2%9A%A1-benefits-of-this-approach"><strong>⚡ Benefits of This Approach</strong></h2>
+<table>
+<thead>
+<tr>
+<th>🔍 <strong>Feature</strong></th>
+<th>✅ <strong>Improvement</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Selective Deployment</strong></td>
+<td>Only updates the microservices that changed.</td>
+</tr>
+<tr>
+<td><strong>Faster CI/CD</strong></td>
+<td>No need to build &amp; push unnecessary images.</td>
+</tr>
+<tr>
+<td><strong>Cost-Effective</strong></td>
+<td>Saves Google Cloud costs by reducing deployments.</td>
+</tr>
+<tr>
+<td><strong>Easier Debugging</strong></td>
+<td>Fewer changes deployed = Easier rollback.</td>
+</tr>
+<tr>
+<td><strong>Future-Proof</strong></td>
+<td>Can add more microservices with minimal effort.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="%F0%9F%9A%80-next-steps"><strong>🚀 Next Steps</strong></h2>
+<p>1️⃣ <strong>Push this updated <code>deploy.yml</code> &amp; documentation to <code>main</code>.</strong><br>
+2️⃣ <strong>Verify that only modified services are deployed.</strong><br>
+3️⃣ <strong>Develop the new &quot;Password Strength Microservice&quot;</strong> 🔐</p>
+<hr>
+<h3 id="%F0%9F%93%8C-summary"><strong>📌 Summary</strong></h3>
+<p>We implemented <strong>Selective Microservice Deployment</strong> to <strong>reduce cloud costs, speed up CI/CD, and make future updates easier</strong>. This ensures that <strong>only the microservices that changed are built and deployed</strong>.</p>
+<p><strong>🔹 Now, we can move on to improving security &amp; adding new microservices efficiently.</strong></p>
+<hr>
+<p><img src="Images/image.png" alt="alt text"></p>
+
+</body>
+</html>
