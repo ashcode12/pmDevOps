@@ -1,0 +1,50 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main  # Runs only when pushing to main
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy to Cloud Run
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔽 Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: 🔐 Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: ⛅ Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: 🔄 Configure Docker for Google Artifact Registry
+        run: gcloud auth configure-docker europe-west1-docker.pkg.dev
+
+      - name: 🏗 Build & Push Auth-Service
+        run: |
+          docker build -t europe-west1-docker.pkg.dev/pmdevops/auth-service:latest ./auth-service
+          docker push europe-west1-docker.pkg.dev/pmdevops/auth-service:latest
+
+      - name: 🏗 Build & Push Vault-Service
+        run: |
+          docker build -t europe-west1-docker.pkg.dev/pmdevops/vault-service:latest ./vault-service
+          docker push europe-west1-docker.pkg.dev/pmdevops/vault-service:latest
+
+      - name: 🚀 Deploy Auth-Service to Cloud Run
+        run: |
+          gcloud run deploy auth-service \
+            --image europe-west1-docker.pkg.dev/pmdevops/auth-service:latest \
+            --region europe-west1 \
+            --allow-unauthenticated
+
+      - name: 🚀 Deploy Vault-Service to Cloud Run
+        run: |
+          gcloud run deploy vault-service \
+            --image europe-west1-docker.pkg.dev/pmdevops/vault-service:latest \
+            --region europe-west1 \
+            --allow-unauthenticated
