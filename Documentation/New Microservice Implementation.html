@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>New Microservice Implementation.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h3 id="comprehensive-documentation-of-the-new-microservice-implementation-in-pmdevops"><strong>Comprehensive Documentation of the New Microservice Implementation in <code>pmDevOps</code></strong></h3>
+<h4 id="introduction"><strong>Introduction</strong></h4>
+<p>As part of the ongoing development of <code>pmDevOps</code>, a <strong>new microservice</strong> was introduced to expand the functionalities of our password manager. This service, named <strong><code>password-service</code></strong>, is designed to <strong>securely encrypt and decrypt passwords</strong>, laying the foundation for robust password storage and management.</p>
+<p>This document provides a <strong>detailed breakdown</strong> of:</p>
+<ul>
+<li>The purpose of this microservice.</li>
+<li>The implementation details.</li>
+<li>The CI/CD pipeline setup.</li>
+<li>Challenges faced and solutions.</li>
+<li>Deployment results and validation.</li>
+</ul>
+<hr>
+<h2 id="1-purpose-of-password-service"><strong>1. Purpose of <code>password-service</code></strong></h2>
+<p>The <code>password-service</code> is responsible for <strong>password encryption and decryption</strong> using strong cryptographic techniques. Unlike the <code>auth-service</code>, which handles authentication, <code>password-service</code> focuses <strong>solely on password security</strong> by ensuring:</p>
+<ul>
+<li>Secure encryption before storing passwords.</li>
+<li>Decryption when authentication is needed.</li>
+</ul>
+<p>With this microservice, sensitive user passwords are <strong>never stored in plaintext</strong>, enhancing security and compliance with best practices.</p>
+<hr>
+<h2 id="2-implementation-details"><strong>2. Implementation Details</strong></h2>
+<h3 id="21-directory-structure"><strong>2.1 Directory Structure</strong></h3>
+<pre class="hljs"><code><div>pmdevops/
+│── auth-service/
+│── vault-service/
+│── password-service/   &lt;-- Newly added microservice
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── server.js
+│   ├── routes/
+│   │   ├── passwordRoutes.js
+│   ├── services/
+│   │   ├── passwordService.js
+│   ├── tests/
+│   │   ├── passwordService.test.js
+│   ├── utils/
+│   │   ├── passwordGenerator.js
+│   ├── .dockerignore
+│   ├── README.md
+</div></code></pre>
+<ul>
+<li><strong><code>server.js</code></strong>: Entry point for the microservice.</li>
+<li><strong><code>passwordRoutes.js</code></strong>: Defines API endpoints for encrypting and decrypting passwords.</li>
+<li><strong><code>passwordService.js</code></strong>: Implements encryption and decryption logic.</li>
+<li><strong><code>passwordGenerator.js</code></strong>: Generates secure passwords.</li>
+<li><strong>Dockerfile</strong>: Configures containerization for Cloud Run.</li>
+</ul>
+<hr>
+<h3 id="22-api-endpoints"><strong>2.2 API Endpoints</strong></h3>
+<table>
+<thead>
+<tr>
+<th><strong>Method</strong></th>
+<th><strong>Endpoint</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/encrypt</code></td>
+<td>Encrypts a given password</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/decrypt</code></td>
+<td>Decrypts an encrypted password</td>
+</tr>
+</tbody>
+</table>
+<p>Example <strong>request</strong> for encrypting a password:</p>
+<pre class="hljs"><code><div>curl -X POST https://password-service-1074737666429.europe-west1.run.app/encrypt \
+     -H <span class="hljs-string">"Content-Type: application/json"</span> \
+     -d <span class="hljs-string">'{"password": "mysecurepassword"}'</span>
+</div></code></pre>
+<p>Example <strong>response</strong>:</p>
+<pre class="hljs"><code><div>{
+  <span class="hljs-attr">"encryptedPassword"</span>: <span class="hljs-string">"U2FsdGVkX19Kq7Xy9HsE0Y1pB0QoB88mGDFETqN"</span>
+}
+</div></code></pre>
+<hr>
+<h3 id="23-password-encryption--decryption-logic"><strong>2.3 Password Encryption &amp; Decryption Logic</strong></h3>
+<p>Implemented using <strong>Node.js and Crypto module</strong>:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">const</span> crypto = <span class="hljs-built_in">require</span>(<span class="hljs-string">'crypto'</span>);
+<span class="hljs-keyword">const</span> secretKey = <span class="hljs-string">'mySecretKey'</span>; <span class="hljs-comment">// Should be stored securely in ENV variables</span>
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">encryptPassword</span>(<span class="hljs-params">password</span>) </span>{
+    <span class="hljs-keyword">const</span> cipher = crypto.createCipher(<span class="hljs-string">'aes-256-cbc'</span>, secretKey);
+    <span class="hljs-keyword">let</span> encrypted = cipher.update(password, <span class="hljs-string">'utf8'</span>, <span class="hljs-string">'hex'</span>);
+    encrypted += cipher.final(<span class="hljs-string">'hex'</span>);
+    <span class="hljs-keyword">return</span> encrypted;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">decryptPassword</span>(<span class="hljs-params">encryptedPassword</span>) </span>{
+    <span class="hljs-keyword">const</span> decipher = crypto.createDecipher(<span class="hljs-string">'aes-256-cbc'</span>, secretKey);
+    <span class="hljs-keyword">let</span> decrypted = decipher.update(encryptedPassword, <span class="hljs-string">'hex'</span>, <span class="hljs-string">'utf8'</span>);
+    decrypted += decipher.final(<span class="hljs-string">'utf8'</span>);
+    <span class="hljs-keyword">return</span> decrypted;
+}
+</div></code></pre>
+<hr>
+<h3 id="24-containerization-with-docker"><strong>2.4 Containerization with Docker</strong></h3>
+<p>To deploy <code>password-service</code>, a <code>Dockerfile</code> was created:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">FROM</span> node:<span class="hljs-number">18</span>
+<span class="hljs-keyword">WORKDIR</span><span class="bash"> /usr/src/app</span>
+<span class="hljs-keyword">COPY</span><span class="bash"> package*.json ./</span>
+<span class="hljs-keyword">RUN</span><span class="bash"> npm install</span>
+<span class="hljs-keyword">COPY</span><span class="bash"> . .</span>
+<span class="hljs-keyword">CMD</span><span class="bash"> [<span class="hljs-string">"node"</span>, <span class="hljs-string">"server.js"</span>]</span>
+<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">3000</span>
+</div></code></pre>
+<hr>
+<h2 id="3-cicd-pipeline-integration"><strong>3. CI/CD Pipeline Integration</strong></h2>
+<h3 id="31-selective-deployment-logic"><strong>3.1 Selective Deployment Logic</strong></h3>
+<p>To ensure that <strong>only modified microservices get deployed</strong>, a selective deployment mechanism was added in <code>deploy.yml</code>:</p>
+<pre class="hljs"><code><div><span class="hljs-attr">deploy-password-service:</span>
+    <span class="hljs-attr">needs:</span> <span class="hljs-string">check-changes</span>
+    <span class="hljs-attr">if:</span> <span class="hljs-string">needs.check-changes.outputs.password-service</span> <span class="hljs-string">==</span> <span class="hljs-string">'true'</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🔽</span> <span class="hljs-string">Checkout</span> <span class="hljs-string">Repository</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v3</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🔐</span> <span class="hljs-string">Authenticate</span> <span class="hljs-string">with</span> <span class="hljs-string">Google</span> <span class="hljs-string">Cloud</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">google-github-actions/auth@v1</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">credentials_json:</span> <span class="hljs-string">${{</span> <span class="hljs-string">secrets.GCP_SA_KEY</span> <span class="hljs-string">}}</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">⛅</span> <span class="hljs-string">Set</span> <span class="hljs-string">up</span> <span class="hljs-string">Google</span> <span class="hljs-string">Cloud</span> <span class="hljs-string">SDK</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">google-github-actions/setup-gcloud@v1</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🔄</span> <span class="hljs-string">Configure</span> <span class="hljs-string">Docker</span> <span class="hljs-string">for</span> <span class="hljs-string">Google</span> <span class="hljs-string">Artifact</span> <span class="hljs-string">Registry</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">gcloud</span> <span class="hljs-string">auth</span> <span class="hljs-string">configure-docker</span> <span class="hljs-string">europe-west1-docker.pkg.dev</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🏗</span> <span class="hljs-string">Build</span> <span class="hljs-string">&amp;</span> <span class="hljs-string">Push</span> <span class="hljs-string">Password-Service</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|
+          docker build -t europe-west1-docker.pkg.dev/pmdevops/password-service/password-service:latest ./password-service
+          docker push europe-west1-docker.pkg.dev/pmdevops/password-service/password-service:latest
+</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">🚀</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">Password-Service</span> <span class="hljs-string">to</span> <span class="hljs-string">Cloud</span> <span class="hljs-string">Run</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|
+          gcloud run deploy password-service \
+            --image europe-west1-docker.pkg.dev/pmdevops/password-service/password-service:latest \
+            --region europe-west1 \
+            --allow-unauthenticated
+</span></div></code></pre>
+<p>This ensures <strong>only changes to <code>password-service</code> trigger a deployment</strong>.</p>
+<hr>
+<h2 id="4-deployment-results"><strong>4. Deployment Results</strong></h2>
+<p>The service was deployed using:</p>
+<pre class="hljs"><code><div>gcloud run deploy password-service \
+  --image europe-west1-docker.pkg.dev/pmdevops/password-service/password-service:latest \
+  --region europe-west1 \
+  --allow-unauthenticated
+</div></code></pre>
+<p>Deployment was <strong>successful</strong>, and the service became available at:
+🔗 <a href="https://password-service-1074737666429.europe-west1.run.app">Password-Service Cloud Run URL</a></p>
+<hr>
+<h2 id="5-challenges--solutions"><strong>5. Challenges &amp; Solutions</strong></h2>
+<table>
+<thead>
+<tr>
+<th><strong>Challenge</strong></th>
+<th><strong>Solution Implemented</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Cannot POST /generate-password</code> error</td>
+<td>Corrected the route mapping to <code>/encrypt</code> and <code>/decrypt</code>.</td>
+</tr>
+<tr>
+<td>Initial deployment failures</td>
+<td>Fixed <strong>Docker image naming conventions</strong> and <strong>Cloud Run port exposure</strong>.</td>
+</tr>
+<tr>
+<td>All services redeploying unnecessarily</td>
+<td>Implemented <strong>Selective Deployment in GitHub Actions</strong>.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="6-next-steps"><strong>6. Next Steps</strong></h2>
+<ol>
+<li><strong>Finalize Unit Tests</strong> – Add comprehensive test cases to validate password encryption.</li>
+<li><strong>Integrate with Frontend</strong> – Expose APIs to be used by the password manager UI.</li>
+<li><strong>Enhance Security</strong> – Store encryption keys in <strong>Google Secret Manager</strong> instead of hardcoded variables.</li>
+</ol>
+<hr>
+<h2 id="7-conclusion"><strong>7. Conclusion</strong></h2>
+<p>With the successful integration of <code>password-service</code>, <code>pmDevOps</code> now has a dedicated microservice for <strong>secure password encryption</strong>. This enhances <strong>modularity, security, and scalability</strong>, paving the way for further enhancements.</p>
+<p>This documentation serves as a reference for all configurations, ensuring transparency and reproducibility of the work done.</p>
+<hr>
+
+</body>
+</html>
