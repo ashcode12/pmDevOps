@@ -45,5 +45,6 @@ app.get("/profile", (req, res) => {
   }
 });
 
+
 // Start the Auth Service
 app.listen(PORT, () => console.log(`Auth service running on port ${PORT}`));
