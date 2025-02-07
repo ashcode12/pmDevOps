@@ -27,24 +27,24 @@ jobs:
 
       - name: 🏗 Build & Push Auth-Service
         run: |
-          docker build -t europe-west1-docker.pkg.dev/pmdevops/auth-service:latest ./auth-service
-          docker push europe-west1-docker.pkg.dev/pmdevops/auth-service:latest
+          docker build -t europe-west1-docker.pkg.dev/pmdevops/auth-service/auth-service:latest ./auth-service
+          docker push europe-west1-docker.pkg.dev/pmdevops/auth-service/auth-service:latest
 
       - name: 🏗 Build & Push Vault-Service
         run: |
-          docker build -t europe-west1-docker.pkg.dev/pmdevops/vault-service:latest ./vault-service
-          docker push europe-west1-docker.pkg.dev/pmdevops/vault-service:latest
+          docker build -t europe-west1-docker.pkg.dev/pmdevops/vault-service/vault-service:latest ./vault-service
+          docker push europe-west1-docker.pkg.dev/pmdevops/vault-service/vault-service:latest
 
       - name: 🚀 Deploy Auth-Service to Cloud Run
         run: |
           gcloud run deploy auth-service \
-            --image europe-west1-docker.pkg.dev/pmdevops/auth-service:latest \
+            --image europe-west1-docker.pkg.dev/pmdevops/auth-service/auth-service:latest \
             --region europe-west1 \
             --allow-unauthenticated
 
       - name: 🚀 Deploy Vault-Service to Cloud Run
         run: |
           gcloud run deploy vault-service \
-            --image europe-west1-docker.pkg.dev/pmdevops/vault-service:latest \
+            --image europe-west1-docker.pkg.dev/pmdevops/vault-service/vault-service:latest \
             --region europe-west1 \
             --allow-unauthenticated
