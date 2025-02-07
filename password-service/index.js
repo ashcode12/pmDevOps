@@ -1,17 +1,19 @@
 const express = require('express');
-require('dotenv').config();
-
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080; // Use the PORT environment variable or default to 8080
 
-// Middleware
 app.use(express.json());
 
-// Routes
+// Import and use routes
 const passwordRoutes = require('./routes/passwordRoutes');
-app.use('/passwords', passwordRoutes);
+app.use(passwordRoutes);
 
-// Start server
-app.listen(port, () => {
-    console.log(`Password Service running on port ${port}`);
+// Root route
+app.get('/', (req, res) => {
+  res.send('Password Service is running!');
+});
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
