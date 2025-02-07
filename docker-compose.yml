@@ -1,4 +1,12 @@
 services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - auth-service
+      - vault-service
+      - utility-service
   auth-service:
     build: ./auth-service
     ports:
