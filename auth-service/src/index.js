@@ -1,13 +1,13 @@
 const express = require("express");
+const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 
 dotenv.config();
 
 const app = express();
-
-// Add this middleware to parse JSON request bodies
 app.use(express.json());
+app.use(cors()); 
 
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "superSecret";
