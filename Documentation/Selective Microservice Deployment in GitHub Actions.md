@@ -140,3 +140,4 @@ We implemented **Selective Microservice Deployment** to **reduce cloud costs, sp
 **🔹 Now, we can move on to improving security & adding new microservices efficiently.**
 
 ---
+![alt text](Images/image.png)
