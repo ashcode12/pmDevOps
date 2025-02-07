@@ -44,4 +44,3 @@ jobs:
         run: |
           cd utility-service
           docker build -t myuser/utility-service:${{ github.sha }} .
-
