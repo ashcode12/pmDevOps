@@ -44,3 +44,17 @@ jobs:
         run: |
           cd utility-service
           docker build -t myuser/utility-service:${{ github.sha }} .
+
+        # Utility Service
+      - name: Password Service - Install & Test
+        run: |
+          cd password-service
+          npm install
+          npm test
+
+      - name: Utility Service - Docker Build
+        run: |
+          cd utility-service
+          docker build -t myuser/password-service:${{ github.sha }} .
+
+
